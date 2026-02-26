@@ -1,0 +1,29 @@
+{
+  "name": "fairdev",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace @fairdev/api\" \"npm run dev --workspace @fairdev/web\" \"npm run dev:worker --workspace @fairdev/api\"",
+    "dev:web": "npm run dev --workspace @fairdev/web",
+    "dev:api": "npm run dev --workspace @fairdev/api",
+    "dev:worker": "npm run dev:worker --workspace @fairdev/api",
+    "build": "npm run build --workspace @fairdev/shared && npm run build --workspace @fairdev/api && npm run build --workspace @fairdev/web",
+    "lint": "npm run lint --workspace @fairdev/shared && npm run lint --workspace @fairdev/api && npm run lint --workspace @fairdev/web",
+    "typecheck": "npm run typecheck --workspace @fairdev/shared && npm run typecheck --workspace @fairdev/api && npm run typecheck --workspace @fairdev/web",
+    "test": "npm run test --workspace @fairdev/shared && npm run test --workspace @fairdev/api && npm run test --workspace @fairdev/web",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "fast-check": "^4.5.3",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.2"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

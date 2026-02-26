@@ -1,0 +1,189 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AnalysisStatus {
+  QUEUED
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum CompanyType {
+  STARTUP
+  FAANG
+  MID_SIZE
+  REMOTE
+}
+
+enum LocationTier {
+  SF_BAY_AREA
+  NEW_YORK_CITY
+  SEATTLE
+  LOS_ANGELES
+  BOSTON
+  AUSTIN
+  CHICAGO
+  ATLANTA
+  DENVER
+  SF_NY_SEA
+  MAJOR_US_CITY
+  REST_US_REMOTE
+}
+
+enum SkillLevel {
+  JUNIOR
+  MID
+  SENIOR
+}
+
+enum FairnessStatus {
+  UNDERPAID
+  FAIR
+  OVERPAID
+}
+
+model User {
+  id         String      @id @default(uuid())
+  email      String      @unique
+  createdAt  DateTime    @default(now()) @map("created_at")
+  magicLinks MagicLink[]
+  resumes    Resume[]
+  analyses   Analysis[]
+
+  @@map("users")
+}
+
+model MagicLink {
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  tokenHash String    @map("token_hash")
+  expiresAt DateTime  @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([tokenHash])
+  @@map("magic_links")
+}
+
+model Resume {
+  id              String   @id @default(uuid())
+  userId          String   @map("user_id")
+  skillsJson      Json     @map("skills_json")
+  yearsExperience Int      @map("years_experience")
+  educationJson   Json     @map("education_json")
+  workHistoryJson Json     @map("work_history_json")
+  createdAt       DateTime @default(now()) @map("created_at")
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  analyses        Analysis[]
+
+  @@index([userId])
+  @@map("resumes")
+}
+
+model Analysis {
+  id              String         @id @default(uuid())
+  userId          String         @map("user_id")
+  resumeId        String?        @map("resume_id")
+  githubUrl       String?        @map("github_url")
+  portfolioUrl    String?        @map("portfolio_url")
+  yearsExperience Int            @map("years_experience")
+  locationTier    LocationTier   @map("location_tier")
+  offeredSalary   Int            @map("offered_salary_usd")
+  companyType     CompanyType    @map("company_type")
+  status          AnalysisStatus @default(QUEUED)
+  progress        Int            @default(0)
+  error           String?
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+  completedAt     DateTime?      @map("completed_at")
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resume          Resume?        @relation(fields: [resumeId], references: [id], onDelete: SetNull)
+  repositories    Repository[]
+  score           Score?
+  report          AnalysisReport?
+  jobEvents       JobEvent[]
+
+  @@index([userId, createdAt])
+  @@index([status])
+  @@map("analyses")
+}
+
+model Repository {
+  id                  String   @id @default(uuid())
+  analysisId          String   @map("analysis_id")
+  name                String
+  url                 String
+  stars               Int
+  forks               Int
+  languagesJson       Json     @map("languages_json")
+  readmeExcerpt       String   @map("readme_excerpt")
+  commitFrequencyJson Json     @map("commit_frequency_json")
+  structureSummary    String   @map("structure_summary")
+  createdAt           DateTime @default(now()) @map("created_at")
+  analysis            Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+
+  @@index([analysisId])
+  @@map("repositories")
+}
+
+model Score {
+  id                String     @id @default(uuid())
+  analysisId        String     @unique @map("analysis_id")
+  codeQuality       Float      @map("code_quality")
+  architecture      Float
+  testing           Float
+  documentation     Float
+  projectComplexity Float      @map("project_complexity")
+  finalSkillScore   Float      @map("final_skill_score")
+  skillLevel        SkillLevel @map("skill_level")
+  createdAt         DateTime   @default(now()) @map("created_at")
+  analysis          Analysis   @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+
+  @@map("scores")
+}
+
+model SalaryData {
+  id            String       @id @default(uuid())
+  locationTier  LocationTier @map("location_tier")
+  companyType   CompanyType  @map("company_type")
+  skillLevel    SkillLevel   @map("skill_level")
+  yearsExpBucket String      @map("years_exp_bucket")
+  minUsd        Int          @map("min_usd")
+  maxUsd        Int          @map("max_usd")
+  sourceLabel   String       @map("source_label")
+  updatedAt     DateTime     @default(now()) @map("updated_at")
+
+  @@unique([locationTier, companyType, skillLevel, yearsExpBucket], map: "salary_unique_idx")
+  @@map("salary_data")
+}
+
+model AnalysisReport {
+  id             String   @id @default(uuid())
+  analysisId     String   @unique @map("analysis_id")
+  resultJson     Json     @map("result_json")
+  pdfGeneratedAt DateTime? @map("pdf_generated_at")
+  createdAt      DateTime @default(now()) @map("created_at")
+  analysis       Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+
+  @@map("analysis_reports")
+}
+
+model JobEvent {
+  id         String   @id @default(uuid())
+  analysisId String   @map("analysis_id")
+  stage      String
+  message    String
+  createdAt  DateTime @default(now()) @map("created_at")
+  analysis   Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+
+  @@index([analysisId, createdAt])
+  @@map("job_events")
+}

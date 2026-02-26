@@ -1,0 +1,47 @@
+[
+  {
+    "locationTier": "SF_BAY_AREA",
+    "companyType": "FAANG",
+    "skillLevel": "MID",
+    "yearsExpBucket": "3-5",
+    "minUsd": 191000,
+    "maxUsd": 258000,
+    "sourceLabel": "seeded_us_salary_v2"
+  },
+  {
+    "locationTier": "NEW_YORK_CITY",
+    "companyType": "FAANG",
+    "skillLevel": "SENIOR",
+    "yearsExpBucket": "6-9",
+    "minUsd": 320000,
+    "maxUsd": 432000,
+    "sourceLabel": "seeded_us_salary_v2"
+  },
+  {
+    "locationTier": "CHICAGO",
+    "companyType": "MID_SIZE",
+    "skillLevel": "JUNIOR",
+    "yearsExpBucket": "0-2",
+    "minUsd": 67000,
+    "maxUsd": 91000,
+    "sourceLabel": "seeded_us_salary_v2"
+  },
+  {
+    "locationTier": "AUSTIN",
+    "companyType": "STARTUP",
+    "skillLevel": "MID",
+    "yearsExpBucket": "3-5",
+    "minUsd": 115000,
+    "maxUsd": 155000,
+    "sourceLabel": "seeded_us_salary_v2"
+  },
+  {
+    "locationTier": "REST_US_REMOTE",
+    "companyType": "STARTUP",
+    "skillLevel": "SENIOR",
+    "yearsExpBucket": "10+",
+    "minUsd": 196000,
+    "maxUsd": 265000,
+    "sourceLabel": "seeded_us_salary_v2"
+  }
+]
