@@ -29,7 +29,11 @@ export default function LoginPage() {
     try {
       const response = await requestMagicLink(email);
       setDevToken(response.devToken ?? null);
-      setMessage("Magic link issued. Check your email or paste the dev token below.");
+      setMessage(
+        response.devToken
+          ? "Magic link issued. Paste the dev token below."
+          : `We sent a sign-in link to ${email}. Open it on this device to sign in.`,
+      );
     } catch (error: any) {
       setMessage(error?.response?.data?.error ?? "Could not request magic link.");
     } finally {

@@ -2,7 +2,9 @@ import { prisma } from "../../db/prisma.js";
 import { createMagicToken, hashToken } from "../../lib/crypto.js";
 import { signAccessToken } from "../../lib/jwt.js";
 import { env } from "../../config/env.js";
+import { HttpError } from "../../lib/errors.js";
 import { logger } from "../../lib/logger.js";
+import { mailIsConfigured, sendMagicLinkEmail } from "../../lib/mail.js";
 
 export async function requestMagicLink(email: string): Promise<{ ok: true; devToken?: string }> {
   const normalizedEmail = email.trim().toLowerCase();
@@ -27,13 +29,23 @@ export async function requestMagicLink(email: string): Promise<{ ok: true; devTo
   });
 
   const link = `${env.APP_BASE_URL}/login?token=${encodeURIComponent(token)}`;
-  logger.info({ userId: user.id, link }, "Magic link created");
+  // The link itself never goes in the log: anyone who can read logs could sign in with it.
+  logger.info({ userId: user.id }, "Magic link created");
+
+  if (mailIsConfigured()) {
+    const sent = await sendMagicLinkEmail(normalizedEmail, link, env.MAGIC_LINK_TTL_MINUTES);
+    if (!sent) {
+      throw new HttpError(502, "The sign-in email could not be sent. Try again in a minute.");
+    }
+    // Mail is on, so the email is the only way in. No dev token shortcut.
+    return { ok: true };
+  }
 
   if (env.MAGIC_LINK_DEV_MODE || env.NODE_ENV !== "production") {
     return { ok: true, devToken: token };
   }
 
-  return { ok: true };
+  throw new HttpError(503, "Sign-in email is not set up on this server yet.");
 }
 
 export async function verifyMagicLink(token: string): Promise<{ accessToken: string; user: { id: string; email: string } }> {

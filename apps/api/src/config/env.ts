@@ -29,6 +29,8 @@ const envSchema = z.object({
   API_BASE_URL: z.string().url().default("http://localhost:4000"),
   CORS_ORIGIN: z.string().default("http://localhost:3000"),
   MAGIC_LINK_TTL_MINUTES: z.coerce.number().int().positive().max(120).default(15),
+  RESEND_API_KEY: z.string().optional(),
+  MAIL_FROM: z.string().default("FairDev <fairdev@johanthegoat.xyz>"),
   MAGIC_LINK_DEV_MODE: z
     .string()
     .optional()
