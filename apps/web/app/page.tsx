@@ -30,7 +30,7 @@ export default function HomePage() {
                 Start Analysis
               </Link>
               <Link className="btn-ghost" href="/login">
-                Login
+                Sign in
               </Link>
             </div>
 

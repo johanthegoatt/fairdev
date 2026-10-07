@@ -82,9 +82,9 @@ export default function ResultsPage() {
     return (
       <main className="min-h-screen px-5 py-10 md:px-10">
         <div className="surface mx-auto max-w-2xl p-6">
-          <p className="text-sm text-slate">You need to login first.</p>
+          <p className="text-sm text-slate">You need to sign in first.</p>
           <Link className="btn-primary mt-4" href="/login">
-            Go to Login
+            Sign in
           </Link>
         </div>
       </main>

@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { createAnalysis, fetchAnalyses, uploadResume } from "../../lib/api";
-import { getAuthToken, getStoredUser } from "../../lib/auth-storage";
+import { clearAuth, getAuthToken, getStoredUser } from "../../lib/auth-storage";
 
 type DashboardFormValues = {
   githubUrl: string;
@@ -115,9 +115,21 @@ export default function DashboardPage() {
             <h1 className="mt-1 text-3xl font-bold [font-family:var(--font-display)]">Portfolio-first analysis</h1>
             <p className="mt-1 text-sm text-slate">Signed in as {user?.email ?? "unknown"}</p>
           </div>
-          <Link className="btn-ghost" href="/login">
-            Switch Account
-          </Link>
+          <div className="flex flex-wrap gap-2">
+            <Link className="btn-ghost" href="/login">
+              Switch Account
+            </Link>
+            <button
+              className="btn-ghost"
+              type="button"
+              onClick={() => {
+                clearAuth();
+                router.replace("/");
+              }}
+            >
+              Sign out
+            </button>
+          </div>
         </header>
 
         <div className="grid gap-6 xl:grid-cols-[1.25fr_0.75fr]">
