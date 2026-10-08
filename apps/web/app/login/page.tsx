@@ -32,7 +32,7 @@ export default function LoginPage() {
       setMessage(
         response.devToken
           ? "Magic link issued. Paste the dev token below."
-          : `We sent a sign-in link to ${email}. Open it on this device to sign in.`,
+          : `We sent a sign-in link to ${email}. Open it on this device to sign in. Not there? Check your spam folder.`,
       );
     } catch (error: any) {
       setMessage(error?.response?.data?.error ?? "Could not request magic link.");
